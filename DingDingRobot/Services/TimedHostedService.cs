@@ -43,7 +43,7 @@ namespace DingDingRobot.Services
                  await RobotHelper.Send(robotSetting);
              }).Wait();
             _logger.LogInformation("Timed Hosted Service is worked");
-            _timer?.Change(robotSetting.PollingTime, 0);
+            _timer?.Change(TimeSpan.FromSeconds(robotSetting.PollingTime), TimeSpan.Zero);
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
