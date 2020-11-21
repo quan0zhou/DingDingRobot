@@ -62,7 +62,7 @@ namespace DingDingRobot.Core
                     failedNum++;
                     sb.Append(result.ToString() + "\r\n");
                 }
-                if (result.Max> pingWarningTime*1000)
+                if (result.Max> pingWarningTime)
                 {
                     warningNum++;
                     sb.Append(result.ToString() + "\r\n");
