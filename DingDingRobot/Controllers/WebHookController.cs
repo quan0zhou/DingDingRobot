@@ -13,6 +13,7 @@ using DingTalk.Api.Request;
 using DingTalk.Api.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace DingDingRobot.Controllers
@@ -22,17 +23,18 @@ namespace DingDingRobot.Controllers
     public class WebHookController : ControllerBase
     {
         private readonly RobotSetting robotSetting;
-
-        public WebHookController(IOptions<RobotSetting> option)
+        private readonly ILogger<WebHookController> _logger;
+        public WebHookController(IOptions<RobotSetting> option, ILogger<WebHookController> logger)
         {
             robotSetting = option.Value;
+            _logger = logger;
         }
 
         [HttpGet("Send")]
         public async Task<string> Send()
         {
 
-            return await RobotHelper.Send(robotSetting);
+            return await RobotHelper.Send(robotSetting, _logger);
         }
 
         [HttpGet("Ping")]

@@ -40,7 +40,7 @@ namespace DingDingRobot.Services
             _logger.LogInformation("Timed Hosted Service is working");
             Task.Run(async () =>
              {
-                 await RobotHelper.Send(robotSetting);
+                 await RobotHelper.Send(robotSetting, _logger);
              }).Wait();
             _logger.LogInformation("Timed Hosted Service is worked");
             _timer?.Change(TimeSpan.FromMilliseconds(robotSetting.PollingTime), TimeSpan.Zero);

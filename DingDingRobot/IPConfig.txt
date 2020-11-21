@@ -1,0 +1,8 @@
+﻿www.baidu.com
+www.bing.com
+www.google.com
+www.sogou.com
+www.taobao.com
+www.QQ.com
+www.JD.com
+www.github.com

@@ -11,7 +11,7 @@ namespace DingDingRobot.Models
         public string Secret { get; set; }
         public string SendUrl { get; set; }
 
-        public string IPAddrs { get; set; }
+        public string[] IPAddrs { get; set; }
 
         public int PingTimes { get; set; }
 

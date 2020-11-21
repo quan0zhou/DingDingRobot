@@ -2,8 +2,10 @@
 using DingTalk.Api;
 using DingTalk.Api.Request;
 using DingTalk.Api.Response;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
@@ -15,8 +17,14 @@ namespace DingDingRobot.Core
 {
     public class RobotHelper
     {
-        public static async Task<string> Send(RobotSetting setting)
+        public static async Task<string> Send(RobotSetting setting,ILogger<object> logger)
         {
+            if (!File.Exists("IPConfig.txt"))
+            {
+                logger.LogError("缺少IPConfig.txt配置文件");
+                return string.Empty;
+            }
+            setting.IPAddrs = File.ReadAllLines("IPConfig.txt");
             string content = await ToPingStr(setting.IPAddrs, setting.PingTimes, setting.PingWarningTime);
             if (!string.IsNullOrEmpty(content))
             {
@@ -47,25 +55,23 @@ namespace DingDingRobot.Core
           
         }
 
-        public static async Task<string> ToPingStr(string IpList,int pingTimes,int pingWarningTime)
+        public static async Task<string> ToPingStr(string[] IpList,int pingTimes,int pingWarningTime)
         {
-            var pingUrls = IpList.Split(",");
             int failedNum = 0;
             int warningNum = 0;
             StringBuilder sb = new StringBuilder();
-            
-            foreach (var item in pingUrls)
+            foreach (var item in IpList)
             {
-                var result = await PingIp(item, pingTimes);
-                if (result.Success==0)
+                switch (await PingIp(item, pingTimes))
                 {
-                    failedNum++;
-                    sb.Append(result.ToString() + "\r\n");
-                }
-                if (result.Max> pingWarningTime)
-                {
-                    warningNum++;
-                    sb.Append(result.ToString() + "\r\n");
+                    case var s when s.Success == 0:
+                        failedNum++;
+                        sb.Append(s.ToString() + "\r\n");
+                        break;
+                    case var s when s.Max > pingWarningTime:
+                        warningNum++;
+                        sb.Append(s.ToString() + "\r\n");
+                        break;
                 }
             }
             if (sb.Length>0)
