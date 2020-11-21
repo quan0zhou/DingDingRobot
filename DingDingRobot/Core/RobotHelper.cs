@@ -70,7 +70,7 @@ namespace DingDingRobot.Core
             }
             if (sb.Length>0)
             {
-                return string.Concat($"ping {pingTimes}次,响应超过{pingWarningTime}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", sb.ToString());
+                return string.Concat($"ping {pingTimes}次,响应超过{pingWarningTime/1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", sb.ToString());
             }
 
             return string.Empty;
@@ -104,7 +104,7 @@ namespace DingDingRobot.Core
 
             }
             result.Success = result.PingTimes - result.Failed;
-            result.LossRate = (result.Failed / result.PingTimes) * 100;
+            result.LossRate = ((double)result.Failed / (double)result.PingTimes) * 100;
             if (roundtripTimeList.Count > 0)
             {
                 result.Min = roundtripTimeList.Min();

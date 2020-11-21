@@ -24,7 +24,7 @@ namespace DingDingRobot.Models
         /// <summary>
         /// 丢包率
         /// </summary>
-        public int LossRate { get; set; }
+        public double LossRate { get; set; }
 
         /// <summary>
         /// ip地址
