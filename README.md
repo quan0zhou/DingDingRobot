@@ -13,7 +13,13 @@
 
 ##### IPConfig.txt---配置IP，注意每个IP需要换行
 
+> 发布
 
+发布独立式应用。 创建 macOS 64 位可执行文件
+`dotnet publish -c Release -r osx-x64 `
 
+发布独立式应用。 创建 Windows 64 位可执行文件
+`dotnet publish -c Release -r win-x64 `
 
+更多publish选项请参考：https://docs.microsoft.com/zh-cn/dotnet/core/tools/dotnet-publish
 

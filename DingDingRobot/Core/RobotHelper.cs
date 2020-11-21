@@ -76,7 +76,7 @@ namespace DingDingRobot.Core
             }
             if (sb.Length>0)
             {
-                return string.Concat($"ping {pingTimes}次,响应超过{pingWarningTime/1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", sb.ToString());
+                return string.Concat($"ping {pingTimes}次,响应超过{(double)pingWarningTime/1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", sb.ToString());
             }
 
             return string.Empty;
