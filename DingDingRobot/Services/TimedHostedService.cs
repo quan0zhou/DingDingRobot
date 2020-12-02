@@ -26,7 +26,7 @@ namespace DingDingRobot.Services
 
         public Task StartAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Timed Hosted Service running.");
+            _logger.LogInformation("服务启动");
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
                 TimeSpan.FromMilliseconds(robotSetting.PollingTime));
@@ -37,18 +37,17 @@ namespace DingDingRobot.Services
         private void DoWork(object state)
         {
             _timer?.Change(Timeout.Infinite, 0);
-            _logger.LogInformation("Timed Hosted Service is working");
+            _logger.LogInformation("开始工作……");
             Task.Run(async () =>
              {
                  await RobotHelper.Send(robotSetting, _logger);
              }).Wait();
-            _logger.LogInformation("Timed Hosted Service is worked");
             _timer?.Change(TimeSpan.FromMilliseconds(robotSetting.PollingTime), TimeSpan.Zero);
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Timed Hosted Service is stopping.");
+            _logger.LogInformation("服务停止");
 
             _timer?.Change(Timeout.Infinite, 0);
 

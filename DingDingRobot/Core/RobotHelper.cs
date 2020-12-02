@@ -28,6 +28,7 @@ namespace DingDingRobot.Core
             string content = await ToPingStr(setting.IPAddrs, setting.PingTimes, setting.PingWarningTime);
             if (!string.IsNullOrEmpty(content))
             {
+                logger.LogInformation(content);
                 long timestamp = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
                 string strSign = timestamp + "\n" + setting.Secret;
                 string sign = string.Empty;
