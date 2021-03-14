@@ -25,6 +25,7 @@ namespace DingDingRobot.Core
                 return string.Empty;
             }
             setting.IPAddrs = File.ReadAllLines("IPConfig.txt");
+            setting.InitAddr();
             string content = await ToPingStr(setting.IPAddrs, setting.PingTimes, setting.PingWarningTime);
             if (!string.IsNullOrEmpty(content))
             {
