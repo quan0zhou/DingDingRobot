@@ -41,7 +41,7 @@ namespace DingDingRobot.Controllers
         public async Task<string>  GetPingStr()
         {
 
-            return await RobotHelper.ToPingStr(robotSetting.IPAddrs, robotSetting.PingTimes, robotSetting.PingWarningTime);
+            return await RobotHelper.ToPingStr(robotSetting);
 
         }
     }
