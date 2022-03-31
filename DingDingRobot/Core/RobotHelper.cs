@@ -4,12 +4,14 @@ using DingTalk.Api.Request;
 using DingTalk.Api.Response;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -17,7 +19,7 @@ namespace DingDingRobot.Core
 {
     public class RobotHelper
     {
-        public static async Task<string> Send(RobotSetting setting,ILogger<object> logger)
+        public static async Task<string> Send(RobotSetting setting, ILogger<object> logger)
         {
             if (!File.Exists("IPConfig.txt"))
             {
@@ -27,9 +29,10 @@ namespace DingDingRobot.Core
             setting.IPAddrs = File.ReadAllLines("IPConfig.txt");
             setting.InitAddr();
             string content = await ToPingStr(setting);
-        
+
             if (!string.IsNullOrEmpty(content))
             {
+                logger.LogInformation(content);
                 return SendDingDingMsg(setting, content);
 
             }
@@ -38,7 +41,7 @@ namespace DingDingRobot.Core
 
         }
 
-        private static string SendDingDingMsg(RobotSetting setting,string content) 
+        private static string SendDingDingMsg(RobotSetting setting, string content)
         {
 
             long timestamp = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
@@ -69,67 +72,71 @@ namespace DingDingRobot.Core
         {
             int failedNum = 0;
             int warningNum = 0;
-            StringBuilder sb = new StringBuilder();
-            foreach (var item in setting.IPAddrs)
+            ConcurrentBag<string> sb = new ConcurrentBag<string>();
+            await Parallel.ForEachAsync(setting.IPAddrs, async (item, cancellationToken) =>
             {
-                switch (await PingIp(item, setting.PingTimes))
-                {
-                    case var s when s.Success == 0:
-                        failedNum++;
-                        SendDingDingMsg(setting, s.ToString());
-                        sb.Append(s.ToString() + "\r\n");
-                        break;
-                    case var s when s.Max > setting.PingWarningTime:
-                        warningNum++;
-                        SendDingDingMsg(setting, s.ToString());
-                        sb.Append(s.ToString() + "\r\n");
-                        break;
-                }
-            }
-            if (sb.Length>0)
+                 switch (await PingIp(item, setting))
+                 {
+                     case var s when s.Success == 0:
+                         Interlocked.Increment(ref failedNum);
+                         sb.Add(s.ToString() + "\r\n");
+                         break;
+                     case var s when s.Max > setting.PingWarningTime:
+                         Interlocked.Increment(ref warningNum);
+                         sb.Add(s.ToString() + "\r\n");
+                         break;
+                 }
+
+             });
+            if (sb.Count > 0)
             {
-                return string.Concat($"ping {setting.PingTimes}次,响应超过{(double)setting.PingWarningTime / 1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", sb.ToString());
+                return string.Concat($"ping {setting.PingTimes}次,响应超过{(double)setting.PingWarningTime / 1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", string.Join("", sb.AsEnumerable()));
             }
 
             return string.Empty;
+
         }
-        private static async Task<PingResult> PingIp(string host, int pingTimes)
+        private static async Task<PingResult> PingIp(string host, RobotSetting setting)
         {
-            Ping pingSender = new Ping();
-            PingResult result = new PingResult { IpAddr = host, PingTimes = pingTimes };
-            List<long> roundtripTimeList = new List<long>();
-            for (int i = 0; i < pingTimes; i++)
+            using (Ping pingSender = new Ping())
             {
-                //模拟ping
-                try
+                PingResult result = new PingResult { IpAddr = host, PingTimes = setting.PingTimes };
+                List<long> roundtripTimeList = new List<long>();
+                for (int i = 0; i < setting.PingTimes; i++)
                 {
-                    PingReply reply = await pingSender.SendPingAsync(host);
-                    if (reply.Status != IPStatus.Success)
+                    //模拟ping
+                    try
                     {
+                        PingReply reply = await pingSender.SendPingAsync(host, setting.PingTimeout);
+                        if (reply.Status != IPStatus.Success)
+                        {
+                            result.Failed += 1;
+                        }
+                        else
+                        {
+                            roundtripTimeList.Add(reply.RoundtripTime);
+                        }
+                    }
+                    catch
+                    {
+
                         result.Failed += 1;
                     }
-                    else
-                    {
-                        roundtripTimeList.Add(reply.RoundtripTime);
-                    }
+
+
                 }
-                catch
+                result.Success = result.PingTimes - result.Failed;
+                result.LossRate = ((double)result.Failed / (double)result.PingTimes) * 100;
+                if (roundtripTimeList.Count > 0)
                 {
-
-                    result.Failed += 1;
+                    result.Min = roundtripTimeList.Min();
+                    result.Max = roundtripTimeList.Max();
+                    result.Avg = (long)roundtripTimeList.Average();
                 }
+                return result;
+            }
 
 
-            }
-            result.Success = result.PingTimes - result.Failed;
-            result.LossRate = ((double)result.Failed / (double)result.PingTimes) * 100;
-            if (roundtripTimeList.Count > 0)
-            {
-                result.Min = roundtripTimeList.Min();
-                result.Max = roundtripTimeList.Max();
-                result.Avg = (long)roundtripTimeList.Average();
-            }
-            return result;
         }
 
 

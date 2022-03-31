@@ -33,8 +33,7 @@ namespace DingDingRobot.Controllers
         [HttpGet("Send")]
         public async Task<string> Send()
         {
-
-            return await RobotHelper.Send(robotSetting, _logger);
+            return await  RobotHelper.Send(robotSetting, _logger);
         }
 
         [HttpGet("Ping")]

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,28 +27,28 @@ namespace DingDingRobot.Services
 
         public Task StartAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("服务启动");
+            _logger.LogDebug("服务启动");
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
                 TimeSpan.FromMilliseconds(robotSetting.PollingTime));
 
             return Task.CompletedTask;
         }
-
-        private void DoWork(object state)
+        private Stopwatch stopwatch = Stopwatch.StartNew();
+        private async void DoWork(object state)
         {
             _timer?.Change(Timeout.Infinite, 0);
-            _logger.LogInformation("开始工作……");
-            Task.Run(async () =>
-             {
-                 await RobotHelper.Send(robotSetting, _logger);
-             }).Wait();
-            _timer?.Change(TimeSpan.FromMilliseconds(robotSetting.PollingTime), TimeSpan.Zero);
+            _logger.LogDebug("开始工作……");
+            stopwatch.Restart();
+            await RobotHelper.Send(robotSetting, _logger);
+            stopwatch.Stop();
+            _logger.LogDebug($"------------------总耗时：{(double)stopwatch.ElapsedMilliseconds/1000}秒---------------");
+           _timer?.Change(TimeSpan.FromMilliseconds(robotSetting.PollingTime), TimeSpan.Zero);
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("服务停止");
+            _logger.LogDebug("服务停止");
 
             _timer?.Change(Timeout.Infinite, 0);
 

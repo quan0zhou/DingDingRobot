@@ -19,6 +19,8 @@ namespace DingDingRobot.Models
 
         public int PollingTime { get; set; }
 
+        public int PingTimeout { get; set; }
+
         public void InitAddr()
         {
             List<string> ipList = new List<string>();

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DingDingRobot.Models
 {
-    public class PingResult
+    public struct PingResult
     {
         /// <summary>
         /// ping的次数
