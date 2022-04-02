@@ -46,6 +46,9 @@ namespace DingDingRobot.Models
         /// </summary>
         public long Avg{ get; set; }
 
+
+
+
         public override string ToString() 
         {
             return $"  • {this.IpAddr} | 成功:{this.Success},失败:{this.Failed},丢包率:{this.LossRate.ToString("0.00")}%,最小值:{this.Min},最大值{this.Max},平均值:{this.Avg}";

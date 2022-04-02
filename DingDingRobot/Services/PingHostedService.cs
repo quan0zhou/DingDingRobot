@@ -1,5 +1,4 @@
-﻿using DingDingRobot.Controllers;
-using DingDingRobot.Core;
+﻿using DingDingRobot.Core;
 using DingDingRobot.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace DingDingRobot.Services
 {
-    public class TimedHostedService : IHostedService, IDisposable
+    public class PingHostedService : IHostedService, IDisposable
     {
-        private readonly ILogger<TimedHostedService> _logger;
+        private readonly ILogger<PingHostedService> _logger;
         private readonly RobotSetting robotSetting;
         private Timer _timer;
 
-        public TimedHostedService(ILogger<TimedHostedService> logger, IOptions<RobotSetting> option)
+        public PingHostedService(ILogger<PingHostedService> logger, IOptions<RobotSetting> option)
         {
             _logger = logger;
             robotSetting = option.Value;
@@ -38,7 +37,7 @@ namespace DingDingRobot.Services
         private async void DoWork(object state)
         {
             _timer?.Change(Timeout.Infinite, 0);
-            _logger.LogDebug("开始工作……");
+            _logger.LogDebug("服务开始工作……");
             stopwatch.Restart();
             await RobotHelper.Send(robotSetting, _logger);
             stopwatch.Stop();

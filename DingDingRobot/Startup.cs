@@ -35,7 +35,7 @@ namespace DingDingRobot
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DingDingRobot", Version = "v1" });
             });
-            services.AddHostedService<TimedHostedService>();
+            services.AddHostedService<PingHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
