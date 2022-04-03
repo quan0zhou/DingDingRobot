@@ -104,12 +104,16 @@ namespace DingDingRobot.Models
                     {
                         for (int i = 0; i < addressArray.Length; i++)
                         {
-                            stringBuilder.Append($"\r\n  {(i+1)}.{addressArray[i].ToString()}");
+                            if (i==0)
+                            {
+                                stringBuilder.Append("\r\n");
+                            }
+                            stringBuilder.Append($" {(i+1)}.{addressArray[i].ToString()}\r\n");
                         }
                     }
                     else
                     {
-                        stringBuilder.Append(addressArray[0].ToString());
+                        stringBuilder.Append(addressArray[0].ToString()+ "\r\n");
                     }
                 }
                 else
@@ -120,7 +124,7 @@ namespace DingDingRobot.Models
             }
             catch (Exception ex)
             {
-                return (true, $"{Url}\r\n • 解析失败。");
+                return (true, $"{Url}\r\n • 解析失败。\r\n");
             }
 
 

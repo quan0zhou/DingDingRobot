@@ -24,22 +24,16 @@ namespace DingDingRobot.Core
             if (!File.Exists("IPConfig.txt"))
             {
                 logger.LogError("缺少IPConfig.txt配置文件");
-                return ;
+                return;
             }
             setting.IPAddrs = File.ReadAllLines("IPConfig.txt");
             setting.InitAddr();
-            var (pingResult, DNSResult) = await ToPingStr(setting);
+            var pingResult = await ToPingStr(setting);
 
             if (!string.IsNullOrEmpty(pingResult))
             {
                 logger.LogInformation(pingResult);
                 SendDingDingMsg(setting, pingResult);
-
-            }
-            if (!string.IsNullOrEmpty(DNSResult))
-            {
-                logger.LogInformation(DNSResult);
-                SendDingDingMsg(setting, DNSResult);
 
             }
         }
@@ -71,7 +65,7 @@ namespace DingDingRobot.Core
             return response.Body;
         }
 
-        public static async Task<(string,string)> ToPingStr(RobotSetting setting)
+        public static async Task<string> ToPingStr(RobotSetting setting)
         {
             int failedNum = 0;
             int warningNum = 0;
@@ -79,7 +73,6 @@ namespace DingDingRobot.Core
             ConcurrentBag<string> DNSBag = new ConcurrentBag<string>();
             await Parallel.ForEachAsync(setting.IpSettings, async (item, cancellationToken) =>
             {
-
 
                 switch (await PingIp(item.Url, setting))
                 {
@@ -102,16 +95,16 @@ namespace DingDingRobot.Core
                 }
 
             });
-            string pingResult = null ,DNSResult=null;
+            string pingResult = null;
             if (pingBag.Count > 0)
             {
-                pingResult= string.Concat($"ping {setting.PingTimes}次,响应超过{(double)setting.PingWarningTime / 1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", string.Join("", pingBag.AsEnumerable()));
+                pingResult = string.Concat($"ping {setting.PingTimes}次,响应超过{(double)setting.PingWarningTime / 1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", string.Join("", pingBag.AsEnumerable()), "\r\n");
             }
-            if (DNSBag.Count>0)
+            if (DNSBag.Count > 0)
             {
-                DNSResult = string.Join("", DNSBag.AsEnumerable());
+                pingResult += string.Join("", DNSBag.AsEnumerable());
             }
-            return (pingResult, DNSResult);
+            return pingResult;
 
         }
         private static async Task<PingResult> PingIp(string host, RobotSetting setting)
