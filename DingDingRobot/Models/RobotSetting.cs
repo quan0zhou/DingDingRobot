@@ -108,7 +108,7 @@ namespace DingDingRobot.Models
                             {
                                 stringBuilder.Append("\r\n");
                             }
-                            stringBuilder.Append($" {(i+1)}.{addressArray[i].ToString()}\r\n");
+                            stringBuilder.Append($" {(i+1)}、{addressArray[i].ToString()}\r\n");
                         }
                     }
                     else
