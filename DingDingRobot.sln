@@ -5,6 +5,10 @@ VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DingDingRobot", "DingDingRobot\DingDingRobot.csproj", "{371E0D55-EF2B-4C16-82C0-5F834EBA0342}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DingDingRobotService", "DingDingRobotService\DingDingRobotService.csproj", "{0574D976-B7B4-41AC-8B11-1A2C45D20DE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DingDingRobotGUI", "DingDingRobotGUI\DingDingRobotGUI.csproj", "{34752344-06E6-4119-BC48-2CF7623D2F78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{371E0D55-EF2B-4C16-82C0-5F834EBA0342}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{371E0D55-EF2B-4C16-82C0-5F834EBA0342}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{371E0D55-EF2B-4C16-82C0-5F834EBA0342}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0574D976-B7B4-41AC-8B11-1A2C45D20DE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0574D976-B7B4-41AC-8B11-1A2C45D20DE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0574D976-B7B4-41AC-8B11-1A2C45D20DE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0574D976-B7B4-41AC-8B11-1A2C45D20DE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34752344-06E6-4119-BC48-2CF7623D2F78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34752344-06E6-4119-BC48-2CF7623D2F78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34752344-06E6-4119-BC48-2CF7623D2F78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34752344-06E6-4119-BC48-2CF7623D2F78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

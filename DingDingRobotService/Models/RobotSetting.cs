@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using System.Text;
-using System.Collections;
+using System.Threading.Tasks;
 
-namespace DingDingRobot.Models
+namespace DingDingRobotService.Models
 {
     public class RobotSetting
     {
 
-        public string Secret { get; set; }
-        public string SendUrl { get; set; }
+        public string Secret { get; set; } = default!;
+        public string SendUrl { get; set; } = default!;
 
-        public string[] IPAddrs { get; set; }
+        public string[] IPAddrs { get; set; } = default!;
 
         public int PingTimes { get; set; }
 
@@ -26,11 +25,11 @@ namespace DingDingRobot.Models
 
         public bool IsAnalyzeUrl { get; set; }
 
-        public List<IpSetting> IpSettings { get; set; }
+        public List<IpSetting> IpSettings { get; set; } = default!;
 
         public void InitAddr()
         {
-            IpSettings=new List<IpSetting>();
+            IpSettings = new List<IpSetting>();
             foreach (var item in IPAddrs)
             {
                 var index = item.Trim().IndexOf("#");
@@ -64,7 +63,7 @@ namespace DingDingRobot.Models
                     #region 仅仅只解析域名或IP
                     if (index > 0)
                     {
-                        IpSettings.Add(new IpSetting(item.Substring(0, index).Trim(),null));
+                        IpSettings.Add(new IpSetting(item.Substring(0, index).Trim(), null));
                     }
                     else
                     {
@@ -80,7 +79,7 @@ namespace DingDingRobot.Models
 
     public struct IpSetting
     {
-        public IpSetting(string url, string[] analyzeIPs)
+        public IpSetting(string url, string[]? analyzeIPs)
         {
             Url = url;
             AnalyzeIPs = analyzeIPs;
@@ -88,15 +87,15 @@ namespace DingDingRobot.Models
         public string Url { get; set; }
 
 
-        public string[] AnalyzeIPs { get; set; }
+        public string[]? AnalyzeIPs { get; set; }
 
 
-        public async Task<(bool, string)> DNSAnalyze()
+        public async Task<(bool, string?)> DNSAnalyze()
         {
 
             if (AnalyzeIPs == null || AnalyzeIPs.Length <= 0)
             {
-                return (false,null);
+                return (false, null);
             }
             try
             {
@@ -104,7 +103,7 @@ namespace DingDingRobot.Models
                 var result = false;
                 foreach (var item in AnalyzeIPs)
                 {
-                    if (!addressArray.Any(r=>r.ToString()==item))
+                    if (!addressArray.Any(r => r.ToString() == item))
                     {
                         result = true;
                         break;
@@ -114,20 +113,20 @@ namespace DingDingRobot.Models
                 if (result)
                 {
                     stringBuilder.Append($"{Url}\r\n • 解析有误。\r\n • 现解析为:");
-                    if (addressArray.Length>1)
+                    if (addressArray.Length > 1)
                     {
                         for (int i = 0; i < addressArray.Length; i++)
                         {
-                            if (i==0)
+                            if (i == 0)
                             {
                                 stringBuilder.Append("\r\n");
                             }
-                            stringBuilder.Append($" {(i+1)}、{addressArray[i].ToString()}\r\n");
+                            stringBuilder.Append($" {(i + 1)}、{addressArray[i].ToString()}\r\n");
                         }
                     }
                     else
                     {
-                        stringBuilder.Append(addressArray[0].ToString()+ "\r\n");
+                        stringBuilder.Append(addressArray[0].ToString() + "\r\n");
                     }
                 }
                 else

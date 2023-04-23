@@ -1,21 +1,18 @@
-﻿using DingDingRobot.Models;
+﻿using DingDingRobotService.Models;
 using DingTalk.Api;
 using DingTalk.Api.Request;
 using DingTalk.Api.Response;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace DingDingRobot.Core
+namespace DingDingRobotService.Core
 {
     public class RobotHelper
     {
@@ -38,7 +35,7 @@ namespace DingDingRobot.Core
             }
         }
 
-        private static string SendDingDingMsg(RobotSetting setting, string content)
+        private static string? SendDingDingMsg(RobotSetting setting, string content)
         {
 
             long timestamp = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
@@ -61,17 +58,20 @@ namespace DingDingRobot.Core
                 Text_ = text
 
             };
+
             OapiRobotSendResponse response = client.Execute(request);
             return response.Body;
+
+
         }
 
-        public static async Task<string> ToPingStr(RobotSetting setting)
+        public static async Task<string?> ToPingStr(RobotSetting setting)
         {
             int failedNum = 0;
             int warningNum = 0;
             ConcurrentBag<string> pingBag = new ConcurrentBag<string>();
-            ConcurrentBag<string> DNSBag = new ConcurrentBag<string>();
-            await Parallel.ForEachAsync(setting.IpSettings, async (item, cancellationToken) =>
+            //ConcurrentBag<string> DNSBag = new ConcurrentBag<string>();
+            await Parallel.ForEachAsync(setting.IpSettings,new ParallelOptions { MaxDegreeOfParallelism=100 }, async (item, cancellationToken) =>
             {
 
                 switch (await PingIp(item.Url, setting))
@@ -90,20 +90,22 @@ namespace DingDingRobot.Core
                 //    var (result, resStr) = await item.DNSAnalyze();
                 //    if (result)
                 //    {
-                //        DNSBag.Add(resStr);
+                //        DNSBag.Add(resStr!);
                 //    }
                 //}
 
             });
-            string pingResult = null;
+
+
+            string? pingResult = null;
             if (pingBag.Count > 0)
             {
-                pingResult = string.Concat($"ping {setting.PingTimes}次,响应超过{(double)setting.PingWarningTime / 1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n", string.Join("", pingBag.AsEnumerable()), "\r\n");
+                pingResult = $"ping {setting.PingTimes}次,响应超过{(double)setting.PingWarningTime / 1000}秒的有{warningNum}个,响应失败的有{failedNum}个\r\n{string.Join("", pingBag.AsEnumerable())}";
             }
-            if (DNSBag.Count > 0)
-            {
-                pingResult += string.Join("", DNSBag.AsEnumerable());
-            }
+            //if (DNSBag.Count > 0)
+            //{
+            //    pingResult += "\r\n"+string.Join("", DNSBag.AsEnumerable());
+            //}
             return pingResult;
 
         }
